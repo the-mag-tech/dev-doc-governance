@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "description": "Central registry for cross-repo architecture decisions.",
+  "rules": {
+    "allowRawGithubAdrLinks": true,
+    "requireDecisionIdForCrossRepoReferences": false
+  },
+  "decisions": [
+    {
+      "id": "fulmail:001",
+      "repo": "the-mag-tech/fulmail",
+      "adrPath": "docs/adr/001-prism-extraction-to-independent-repo.md",
+      "canonicalUrl": "https://github.com/the-mag-tech/fulmail/blob/main/docs/adr/001-prism-extraction-to-independent-repo.md",
+      "status": "Proposed",
+      "title": "Extract Prism to Independent Repository"
+    },
+    {
+      "id": "skillet:001",
+      "repo": "the-mag-tech/skillet",
+      "adrPath": "doc/adr/001-creator-content-terminal.md",
+      "canonicalUrl": "https://github.com/the-mag-tech/skillet/blob/main/doc/adr/001-creator-content-terminal.md",
+      "status": "Superseded",
+      "title": "Skillet - Creator Content Terminal Architecture"
+    },
+    {
+      "id": "skillet:002",
+      "repo": "the-mag-tech/skillet",
+      "adrPath": "doc/adr/002-bidirectional-feedback-contract.md",
+      "canonicalUrl": "https://github.com/the-mag-tech/skillet/blob/main/doc/adr/002-bidirectional-feedback-contract.md",
+      "status": "Proposed",
+      "title": "Bidirectional Feedback Contract between SkillRank and Prism"
+    },
+    {
+      "id": "skillet:003",
+      "repo": "the-mag-tech/skillet",
+      "adrPath": "doc/adr/003-skillet-as-discovery-search-backend.md",
+      "canonicalUrl": "https://github.com/the-mag-tech/skillet/blob/main/doc/adr/003-skillet-as-discovery-search-backend.md",
+      "status": "Proposed",
+      "title": "Skillet as Skill Hub/Bundle Discovery and Search Backend"
+    },
+    {
+      "id": "skillrank:001",
+      "repo": "the-mag-tech/skillrank",
+      "adrPath": "doc/adr/001-hub-as-domain-pagerank-model.md",
+      "canonicalUrl": "https://github.com/the-mag-tech/skillrank/blob/main/doc/adr/001-hub-as-domain-pagerank-model.md",
+      "status": "Proposed",
+      "title": "Hub-as-Domain PageRank Model"
+    }
+  ]
+}

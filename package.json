@@ -1,0 +1,26 @@
+{
+  "name": "@erergb/doc-governance",
+  "version": "0.1.0",
+  "description": "Shared documentation governance CLI for ADR/Pitfall index and checks",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "doc-governance": "./bin/doc-governance.mjs"
+  },
+  "scripts": {
+    "doc:governance": "node ./bin/doc-governance.mjs run --root .",
+    "doc:check": "node ./bin/doc-governance.mjs check --root .",
+    "doc:check:registry": "node ./bin/doc-governance.mjs check-registry --root .",
+    "gen:index": "node ./bin/doc-governance.mjs gen-index --root ."
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "docs",
+    "adr",
+    "governance"
+  ],
+  "license": "MIT",
+  "packageManager": "pnpm@10.24.0+sha512.01ff8ae71b4419903b65c60fb2dc9d34cf8bb6e06d03bde112ef38f7a34d6904c424ba66bea5cdcf12890230bf39f9580473140ed9c946fef328b6e5238a345a"
+}
