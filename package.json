@@ -11,7 +11,12 @@
     "doc:governance": "node ./bin/doc-governance.mjs run --root .",
     "doc:check": "node ./bin/doc-governance.mjs check --root .",
     "doc:check:registry": "node ./bin/doc-governance.mjs check-registry --root .",
-    "gen:index": "node ./bin/doc-governance.mjs gen-index --root ."
+    "doc:check:topology": "node ./bin/doc-governance.mjs check-topology --root .",
+    "doc:check:index": "node ./bin/doc-governance.mjs check-index --root .",
+    "gen:index": "node ./bin/doc-governance.mjs gen-index --root .",
+    "test": "node --test",
+    "test:e2e:agents": "node ./scripts/agent-e2e.mjs --agents=claude,codex,cursor",
+    "test:e2e:agents:local": "node ./scripts/agent-e2e.mjs --local-only"
   },
   "engines": {
     "node": ">=20"
