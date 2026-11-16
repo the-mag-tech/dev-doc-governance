@@ -14,6 +14,10 @@ Doc Governance is the umbrella CLI. It keeps separate capabilities composable:
 
 Topology governs where. Index governs list.
 
+The bundled skills resolve commands and document paths in the consuming repository.
+Auto Index covers the implemented ADR and pitfall indexes; discussion logs and any
+usage evidence stay with the consumer instead of the shared skill installation.
+
 - Generate ADR and pitfall index tables between `INDEX` markers
 - Check generated ADR and pitfall indexes without mutating files
 - Validate optional doc topology manifests
