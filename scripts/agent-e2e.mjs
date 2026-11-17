@@ -76,11 +76,11 @@ function promptFor(bundleRoot) {
   ].join(' ');
 }
 
-function summaryPassed(result) {
+function summaryPassed(result, expectedTests) {
   const output = outputOf(result);
   return result.status === 0 &&
-    /tests\D+18/i.test(output) &&
-    /pass\D+18/i.test(output) &&
+    Number(output.match(/tests\D+(\d+)/i)?.[1]) === expectedTests &&
+    Number(output.match(/pass\D+(\d+)/i)?.[1]) === expectedTests &&
     /fail\D+0/i.test(output);
 }
 
@@ -187,6 +187,8 @@ function main() {
   const local = runLocal(bundleRoot);
   printResult('local bundle', local);
   if (local.status !== 0) process.exit(1);
+  const expectedTests = Number(outputOf(local).match(/tests\D+(\d+)/i)?.[1]);
+  if (!expectedTests || !summaryPassed(local, expectedTests)) process.exit(1);
 
   if (localOnly || agents.length === 0) {
     console.log('\nAgent E2E bundle is ready.');
@@ -210,7 +212,7 @@ function main() {
     }
     const result = runner(bundleRoot);
     printResult(agent, result);
-    if (!summaryPassed(result)) failed = true;
+    if (!summaryPassed(result, expectedTests)) failed = true;
   }
 
   if (failed) process.exit(1);

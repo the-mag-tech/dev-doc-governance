@@ -22,7 +22,7 @@ usage evidence stay with the consumer instead of the shared skill installation.
 - Check generated ADR and pitfall indexes without mutating files
 - Validate optional doc topology manifests
 - Validate ADR metadata fields (`Status`, `Date`)
-- Validate ADR to discussion log pairing
+- Validate ADR to discussion log pairing for Proposed, Draft and Active decisions
 - Treat `*.discussion.md` and `*.exploration.md` as ADR sidecars (no index row, no `Status`/`Date` header enforcement)
 - Validate project-level `AGENTS.md` and optional `CLAUDE.md` links
 - Validate package-level `AGENTS.md` links (`apps/*`, `packages/*`, and nested AGENTS files)
@@ -46,7 +46,8 @@ doc-governance check-topology --root /path/to/repo --topology-manifest ./doc-gov
 
 Command behavior:
 
-- `gen-index` mutates ADR and pitfall README index blocks.
+- `--help` prints usage without writing files; unknown options and missing values fail before work starts. With no command, the existing default remains `run`.
+- `gen-index` mutates ADR and pitfall README index blocks only when each README contains exactly one ordered pair of markers.
 - `check-index` is non-mutating and fails when generated indexes are stale or markers are missing.
 - `check-topology` is non-mutating and validates a repo-local topology manifest.
 - `check` is non-mutating and composes metadata, link, registry, stale-index, and topology checks when a topology manifest exists.
@@ -144,7 +145,7 @@ npm run test:e2e:agents:local
 npm run test:e2e:agents
 ```
 
-`test:e2e:agents:local` builds the isolated bundle and runs the 18-test suite
+`test:e2e:agents:local` builds the isolated bundle and runs the fixture suite
 locally. `test:e2e:agents` runs the same suite through Claude Code, Codex, and
 Cursor Agent non-interactive CLIs.
 
@@ -176,7 +177,7 @@ Archive behavior:
 
 Validation behavior:
 
-- If `--decision-registry` is provided, CLI uses that file.
+- If `--decision-registry` is provided, CLI uses that file and fails if it is missing.
 - Otherwise CLI checks local `./decision-registry.json`.
 - If none exists, CLI falls back to bundled registry in this package.
 
