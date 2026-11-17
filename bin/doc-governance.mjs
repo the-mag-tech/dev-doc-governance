@@ -3,6 +3,7 @@
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseArgs } from 'node:util';
 
 const START_MARKER = '<!-- INDEX:START -->';
 const END_MARKER = '<!-- INDEX:END -->';
@@ -26,21 +27,7 @@ const BASE_SKIP_DIRS = new Set([
   '.pnpm-store',
 ]);
 
-function parseArg(flag, fallback) {
-  const idx = process.argv.indexOf(flag);
-  if (idx === -1 || idx + 1 >= process.argv.length) return fallback;
-  return process.argv[idx + 1];
-}
-
-function hasFlag(flag) {
-  return process.argv.includes(flag);
-}
-
-function commandFromArgs() {
-  const cmd = process.argv[2];
-  if (!cmd || cmd.startsWith('-')) return 'run';
-  return cmd;
-}
+const USAGE = 'Usage: doc-governance [gen-index|check-index|check-topology|check|check-registry|run|fix] [--root <path>] [--include-archive] [--decision-registry <path>] [--topology-manifest <path>]';
 
 function isPlainObject(value) {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -254,8 +241,9 @@ function isIgnoredTopologyEntry(name, options = {}) {
 function ensureMarkers(readmePath) {
   if (!existsSync(readmePath)) throw new Error(`README not found: ${readmePath}`);
   const content = readFileSync(readmePath, 'utf-8');
-  if (!content.includes(START_MARKER) || !content.includes(END_MARKER)) {
-    throw new Error(`Index markers are missing in ${readmePath}`);
+  if (content.split(START_MARKER).length !== 2 || content.split(END_MARKER).length !== 2
+      || content.indexOf(START_MARKER) >= content.indexOf(END_MARKER)) {
+    throw new Error(`Index markers must form one ordered pair in ${readmePath}`);
   }
 }
 
@@ -442,6 +430,7 @@ function requiresDiscussion(status) {
   const normalized = normalizeStatus(status);
   if (normalized.startsWith('proposed')) return true;
   if (normalized.startsWith('draft')) return true;
+  if (normalized.startsWith('active')) return true;
   return false;
 }
 
@@ -935,7 +924,10 @@ function resolveRegistryPath(root, options = {}) {
 
 function loadDecisionRegistry(root, errors, options = {}) {
   const registryPath = resolveRegistryPath(root, options);
-  if (!registryPath || !existsSync(registryPath)) return null;
+  if (!registryPath || !existsSync(registryPath)) {
+    if (options.decisionRegistryPath) errors.push(`Decision registry not found: ${registryPath}`);
+    return null;
+  }
 
   const registry = parseJsonFile(registryPath, errors, root, 'decision-registry.json');
   if (!registry) return null;
@@ -1038,13 +1030,25 @@ function checkDecisionRegistryUsage(root, errors, options = {}) {
 }
 
 async function main() {
-  const root = resolve(parseArg('--root', '.'));
+  const { values, positionals } = parseArgs({
+    options: {
+      root: { type: 'string', default: '.' },
+      'include-archive': { type: 'boolean', default: false },
+      'decision-registry': { type: 'string' },
+      'topology-manifest': { type: 'string' },
+      help: { type: 'boolean', short: 'h' },
+    },
+    allowPositionals: true,
+  });
+  if (positionals.length > 1) throw new Error(USAGE);
+  if (values.help) { console.log(USAGE); return; }
+  const root = resolve(values.root);
   const options = {
-    includeArchive: hasFlag('--include-archive'),
-    decisionRegistryPath: parseArg('--decision-registry', null),
-    topologyManifestPath: parseArg('--topology-manifest', null),
+    includeArchive: values['include-archive'],
+    decisionRegistryPath: values['decision-registry'],
+    topologyManifestPath: values['topology-manifest'],
   };
-  const cmd = commandFromArgs();
+  const cmd = positionals[0] ?? 'run';
 
   if (cmd === 'gen-index') {
     generateIndexes(root, options);

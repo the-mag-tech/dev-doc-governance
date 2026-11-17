@@ -513,3 +513,40 @@ test('check-index detects stale generated indexes without writing files', () => 
   const fresh = runCli(root, ['check-index']);
   assert.equal(fresh.status, 0, fresh.stdout + fresh.stderr);
 }));
+
+
+test('help and invalid options never mutate indexes', () => withRepo((root) => {
+  writeFile(join(root, 'doc/adr/README.md'), '<!-- INDEX:START -->\nstale\n<!-- INDEX:END -->\n');
+  const snapshot = snapshotFiles(root, ['doc/adr/README.md']);
+  for (const args of [['--help'], ['--unknown'], ['gen-index', '--unknown'], ['gen-index', '--topology-manifest']]) {
+    const result = runCli(root, args);
+    assert.equal(result.status === 0, args[0] === '--help', result.stdout + result.stderr);
+    assertSnapshotUnchanged(root, snapshot);
+  }
+}));
+
+test('generation rejects reversed or repeated index markers without writes', () => withRepo((root) => {
+  const file = join(root, 'doc/adr/README.md');
+  for (const text of ['<!-- INDEX:END -->\nkeep\n<!-- INDEX:START -->', '<!-- INDEX:START -->\nkeep\n<!-- INDEX:END -->\n<!-- INDEX:END -->']) {
+    writeFile(file, text);
+    const result = runCli(root, ['gen-index']);
+    assert.notEqual(result.status, 0);
+    assert.equal(readFileSync(file, 'utf-8'), text);
+  }
+}));
+
+test('an explicitly missing registry is an error rather than skipped validation', () => withRepo((root) => {
+  const result = runCli(root, ['check-registry', '--decision-registry', 'absent.json']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /registry.*not found/i);
+}));
+
+test('Active decisions require the discussion log promised by the skill policy', () => withRepo((root) => {
+  writePassingGovernanceRepo(root);
+  const adr = join(root, 'doc/adr/001-first.md');
+  writeFile(adr, readFileSync(adr, 'utf-8').replace('Accepted', 'Active'));
+  assert.equal(runCli(root, ['gen-index']).status, 0);
+  const result = runCli(root, ['check']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /missing discussion link/);
+}));
