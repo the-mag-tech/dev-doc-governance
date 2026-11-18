@@ -30,7 +30,7 @@ Record *why* a decision was made, not only *what* was decided.
 ### Decision Journey
 ...
 
-### Key Human Insights
+### Attributed Insights (when present)
 ...
 
 ### Downstream Effects
@@ -56,8 +56,10 @@ Record *why* a decision was made, not only *what* was decided.
    configured package script). The bundled `verify-usage.sh` checks only this
    skill repository's usage markers; it is not validation of the new decision log.
 
+Include human judgments only when the source contains them. Distinguish them from agent analysis and tool observations; omit empty template sections instead of inventing a viewpoint or treating a task instruction as an endorsed conclusion.
+
 ## Anti-Patterns
 
 - Raw chat dump
-- Agent-centric log without human decision points
+- Inventing human decision points or attributing an agent inference to the user
 - Feature-list summary without reasoning path
