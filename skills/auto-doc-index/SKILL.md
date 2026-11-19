@@ -5,36 +5,26 @@ description: "Auto-generate ADR/Pitfall index tables from source files to preven
 
 # Auto Doc Index
 
-Generate derived index tables between `<!-- INDEX:START -->` and
-`<!-- INDEX:END -->` markers. Treat README indexes as build artifacts, not
-manual state.
+Regenerate ADR/Pitfall README tables from the documents' title, `Status` and `Date`.
+Only the text between `<!-- INDEX:START -->` and `<!-- INDEX:END -->` is derived.
+Preserve source bodies and everything outside those markers.
 
-## Use When
+Resolve the consumer's absolute repository root and index markers. Use its
+configured `gen:index` script when present; otherwise run
+`doc-governance gen-index --root /absolute/consumer-repo`, or
+`node /absolute/dev-doc-governance/bin/doc-governance.mjs gen-index --root /absolute/consumer-repo`.
+For the bundled parser, ADR filenames are `NNN-*.md` (three digits), with
+`# ADR-NNN: Title`, a `Status:` line (or `## Status` section), and
+`Date: YYYY-MM-DD`. Pitfalls use `PIT-N*.md`, `# PIT-N: Title` and bold field
+labels such as `**Area:**`, `**Severity:**`, `**Status:**`. These are this generator's
+conventions; inspect a different consumer generator before applying them there.
 
-- Adding/updating ADR/Pitfall docs
-- Creating a new doc directory that needs an index
-- Fixing merge conflicts caused by hand-edited README tables
+Compare generated rows with the intended source-file inventory: an unsupported
+filename can be silently omitted while generation and `check-index` both pass.
+Report mismatches instead of silently renaming source documents. Then run the same
+CLI's `check-index --root /absolute/consumer-repo` and include only the resulting
+authorized documentation changes.
 
-## Core Principle
-
-Each document is the source of truth. Index tables are pure derived views.
-
-## Workflow
-
-1. Ensure doc files contain required metadata (`Status`, `Date`, title)
-2. Ensure target README has index markers
-3. Resolve the consuming repository's absolute root. If it already defines
-   `gen:index`, use its configured package manager. Otherwise call the installed
-   `doc-governance gen-index --root /absolute/consumer-repo`, or
-   `node /absolute/dev-doc-governance/bin/doc-governance.mjs gen-index --root /absolute/consumer-repo`.
-   The bundled generator supports its discovered ADR and pitfall directories;
-   do not claim RFC or arbitrary-folder indexing without a matching implementation.
-4. Verify with the same CLI's `check-index --root /absolute/consumer-repo`.
-
-5. Include derived index updates in the authorized documentation change
-
-## Boundaries
-
-- Do not edit document content bodies
-- Do not edit README content outside index markers
-- Do not use this for editorial/manual curation lists
+The bundled generator discovers ADR and pitfall directories. Inspect an actual
+implementation before claiming RFC or arbitrary-folder support. Editorial lists
+remain manual; do not turn them into generated indexes.
